@@ -55,11 +55,17 @@
             box-shadow: 0 0 10px cyan;
         }
 @media (max-width: 768px) {
-    .nav-links {
-        flex-direction: column;
-        gap: 10px;
-        text-align: center;
+    .logo {
+        width: 80px; /* Smaller logo */
+        height: auto;
     }
+
+    .project img {
+        width: 100%; /* Makes project images responsive */
+        height: auto;
+        border-radius: 10px; /* Optional: rounded corners for aesthetics */
+    }
+}
 
         .nav-links {
             display: flex;
