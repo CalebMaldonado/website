@@ -55,14 +55,30 @@
             box-shadow: 0 0 10px cyan;
         }
 @media (max-width: 768px) {
-     .skills-grid {
-        display: block; /* Prevents grid from creating extra columns */
+    body {
+        overflow-x: hidden; /* Prevents unwanted horizontal scrolling */
     }
 
-    .project img {
-        width: 100%; /* Makes project images responsive */
+    .container, .section, .nav-links {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        width: 100%; /* Forces it to take the full width */
+    }
+
+    .nav-links {
+        padding: 10px 0;
+    }
+
+    .nav-links li {
+        width: 100%; /* Ensures the links don’t appear in multiple columns */
+    }
+
+    img {
+        max-width: 100%;
         height: auto;
-        border-radius: 10px; /* Optional: rounded corners for aesthetics */
+        display: block;
     }
 }
 
