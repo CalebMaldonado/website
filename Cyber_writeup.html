@@ -63,6 +63,16 @@
             margin: 0 auto;
         }
 
+        .code-block {
+            overflow-x: auto;
+            background: #eee;
+            padding: 0.5em;
+            border-radius: 4px;
+            max-width: 100%;
+            white-space: nowrap;
+        }
+
+
     </style>
 </head>
 <body>
@@ -137,7 +147,7 @@
         <img src="question2.png" alt="Query 2 Screenshot" width="870" class="responsive-img">
 
         <p><strong>On the same host, a registry key was also updated regarding the new backdoor user. What is the full path of that registry key?</strong><br>
-        <strong>Answer:</strong> HKLM\SAM\SAM\Domains\Account\Users\Names\A1berto</p>
+        <strong>Answer:</strong> <pre class="code-block"><code>HKLM\SAM\SAM\Domains\Account\Users\Names\A1berto</code></pre></p>
 
         The first thing I did was to look up for Event ID 13 and see if there were any relevant changes to the registry key. Once there I refined my search to
         focus on the specific registry path associated with the new user account (A1berto).</p>
