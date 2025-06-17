@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lab Writeup Outline</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+        header {
+            background-color: #0c2340;
+            color: #f15a22;
+            padding: 1rem 0;
+            text-align: center;
+        }
+        nav {
+            margin: 20px 0;
+            text-align: center;
+        }
+        nav a {
+            margin: 0 15px;
+            color: #0c2340;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        section {
+            padding: 20px;
+            margin: 20px auto;
+            background-color: #fff;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            max-width: 900px;
+        }
+        h1, h2, h3 {
+            color: #0c2340;
+        }
+        h2 {
+            border-bottom: 2px solid #f15a22;
+            padding-bottom: 5px;
+        }
+        code, pre {
+            background: #eee;
+            padding: 0.2em 0.4em;
+            border-radius: 4px;
+            font-size: 1em;
+        }
+        ul, ol {
+            margin-left: 1.5em;
+        }
+        footer {
+            text-align: center;
+            margin: 30px 0 10px 0;
+            color: #888;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <img src="i.png" alt="Cybersec logo" width="120">
+        <h1>Lab Writeup: [Lab Title]</h1>
+        <p>Cybersecurity Lab Documentation</p>
+    </header>
+
+    <nav>
+        <a href="#writeup1">Investigating with Splunk</a>
+        <a href="index.html" style="margin-left:30px; padding: 10px 20px; background-color: #0c2340; color: white; text-decoration: none; border-radius: 5px;">Home</a>
+    </nav>
+
+    <!-- Writeup 1 -->
+    <section id="writeup1">
+        <h2>Investigating with Splunk</h2>
+        <section id="overview1">
+            <h3>Overview</h3>
+            <p>This room by TryHackMe simulates a scenario in which a SOC analyst investigates suspicious
+                activity across multiple Windows hosts. The exercise focuses on analyzing event logs ingested into Splunk to identify
+                potential backdoor access and signs of compromise. Data sources include standard Windows event logs that reveal anomalous
+                behavior suggesting unauthorized access. By querying and correlating log data, the analyst is tasked
+                with uncovering indicators of compromise (IOCs) and reconstructing the attacker’s actions. This hands-on lab
+                builds foundational skills in log analysis, threat detection, and incident investigation, key responsibilities
+                of a SOC Level 1 analyst.</p>
+            <h3>Task 1 Investigating with Splunk</h3>
+                <p>SOC Analyst Johny has observed some anomalous behaviours in the logs of a few windows machines. It
+                looks like the adversary has access to some of these machines and successfully created some backdoor. His manager
+                has asked him to pull those logs from suspected hosts and ingest them into Splunk for quick investigation. Our task
+                as SOC Analyst is to examine the logs and identify the anomalies.
+
+                To learn more about Splunk and how to investigate the logs, look at the rooms splunk101 and splunk201.
+
+                Room MachineBefore moving forward, deploy the machine. When you deploy the machine, it will be assigned an IP <strong>Machine IP:</strong>
+                <code>MACHINE_IP</code>. You can visit this IP from the VPN or the Attackbox. The machine will take up to 3-5 minutes to start. All the
+                required logs are ingested in the index main.</p>
+        </section>
+        <section id="setup1">
+            <h3>Environment Setup</h3>
+    <ul>
+        <li>This lab was completed in the <strong>SOC Level 1</strong> room on <strong>TryHackMe</strong>, which simulates a real-world SOC analyst workflow.</li>
+        <li><strong>Splunk SIEM</strong> was used to ingest and analyze logs from suspected Windows hosts.</li>
+        <li>Log sources included:
+            <ul>
+                <li>Windows Security Logs (e.g., logon events, privilege usage)</li>
+                <li>Sysmon Logs (e.g., process creation, network activity)</li>
+                <li>PowerShell Operational Logs</li>
+            </ul>
+        </li>
+        <li>All analysis was done through a pre-configured, browser-accessible Splunk instance hosted by TryHackMe</li>
+        <li>This environment provided a realistic opportunity to practice threat detection, event correlation, and incident response using industry-standard tools.</li>
+    </ul>
+        </section>
+        <section id="steps1">
+        <h2>Investigation Questions & Answers</h2>
+
+        <p><strong>How many events were collected and ingested in the index "main"?</strong><br>
+        <strong>Answer:</strong> 12,256</p>
+
+        <p><em>Query:</em><code>index="main"</code></p>
+
+        <img src="question1.png" alt="Query 1 Screenshot" width="870">
+
+        <p><strong>On one of the infected hosts, the adversary was successful in creating a backdoor user. What is the new username?</strong><br>
+        <strong>Answer:</strong> A1berto</p>
+
+        <p><strong>Event ID 4720</strong> is logged whenever a user account is created on Windows Security Event Log</p>
+
+        <p><em>Query:</em> <code>index="main" EventID="4720"</code></p>
+
+        <img src="question2.png" alt="Query 2 Screenshot" width="870">
+
+        <p><strong>On the same host, a registry key was also updated regarding the new backdoor user. What is the full path of that registry key?</strong><br>
+        <strong>Answer:</strong> HKLM\SAM\SAM\Domains\Account\Users\Names\A1berto</p>
+
+        The first thing I did was to look up for Event ID 13 and see if there were any relevant changes to the registry key. Once there I refined my search to
+        focus on the specific registry path associated with the new user account (A1berto).</p>
+
+        <p><em>Query:</em> <code>index="main" EventID=13 A1berto</code></p>
+
+        <img src="question3.png" alt="Query 3 Screenshot" width="870">
+
+        <p><strong>Examine the logs and identify the user that the adversary was trying to impersonate.</strong><br>
+        <strong>Answer:</strong> Alberto</p>
+        
+        <p>The names of users are found in the “User” field. The newly created user “A1berto” is not the same as “Alberto”; therefore, “Alberto” is the likely impersonation target.</p>
+        
+        <p><em>Query:</em> <code>index="main"</code></p>
+
+        <img src="question4.png" alt="Query 4 Screenshot" width="870">
+
+        <p><strong>What is the command used to add a backdoor user from a remote computer?</strong><br>
+        <strong>Answer:</strong> <code>C:\windows\System32\Wbem\WMIC.exe” /node:WORKSTATION6 process call create “net user /add A1berto paw0rd1</code></p>
+
+        <p>I filtered for the Sysmon EventID 1, which is for process creation. I then applied the A1berto username and found the answer as the first result in the
+        "CommandLine" field.</p>
+
+        <p><em>Query:</em> <code>index="main" EventID=1 A1berto</code></p>
+
+        <img src="question5.png" alt="Query 5 Screenshot" width="870">
+
+        <p><strong>How many times was the login attempt from the backdoor user observed during the investigation?</strong><br>
+        <strong>Answer:</strong> 0</p>
+        
+        <p>I then decided to check for successful (4624) and failed (4625) logon events involving the backdoor user. However, no events were found and that ended up being the answer.</p>
+        <p><em>Query:</em> <code>index="main" EventID="4625" OR EventID="4624" A1berto</code></p>
+
+        <img src="question6.png" alt="Query 6 Screenshot" width="870">
+
+        <p><strong>What is the name of the infected host on which suspicious PowerShell commands were executed?</strong><br>
+        <strong>Answer:</strong> James.browne</p>
+        <p>These event IDs represent PowerShell script block logging and command invocation. The hostname can be found in the event fields.</p>
+        <p><em>Query:</em> <code>index="main" PowerShell/code></p>
+        <img src="question7.png" alt="Query 7 Screenshot" width="870">
+
+        <p><strong>PowerShell logging is enabled on this device. How many events were logged for the malicious PowerShell execution?</strong><br>
+        <strong>Answer:</strong> 79</p>
+        <p>These event IDs represent PowerShell script block logging(4104) and command invocation(4103).</p>
+        <p><em>Query:</em> <code>index="main" EventID="4104" OR EventID="4103"</code></p>
+        <img src="question7.png" alt="Query 7 Screenshot" width="870">
+
+        <p><strong>An encoded Powershell script from the infected host initiated a web request. What is the full URL?</strong><br>
+        <strong>Answer:</strong> hxxp[://]10[.]10[.]10[.]5/news[.]php</p>
+        <p>I used the same query as the previous question, I then looked into the ContextInfo field and found almost every result had the same encrypted string</p>
+        <img src="question81.png" alt="Query 8 Screenshot" width="870">
+        <p>I then wanted to get only the Host Application section to see if there were any other encrypted strings. I used <code>| rex field=ContextInfo "Host Application = (?<Command>[^\r\n]+)"</code></p>
+        <p>After that I wanted to make sure that the contents of the newly created "Command" field does not get duplicated so I used <code>| dedup Command</code> This lead me to this:</p>
+        <img src="question82.png" alt="Query 9 Screenshot" width="870">
+        <p>I then extracted the string, ran it through cyberchef, and decoded it using base64.</p>
+        <img src="question83.png" alt="Query 10 Screenshot" width="870">
+        <p>From there I got the IP address and defanged it.</p>
+        <img src="question84.png" alt="Query 11 Screenshot" width="870">
+        <section id="conclusion1">
+        <h3>Conclusion</h3>
+        <p>Completing the SOC Level 1 room on TryHackMe gave me hands-on experience
+        in using Splunk to investigate a simulated Windows compromise. I practiced
+        querying different event types — including account creation, PowerShell execution,
+        and registry modifications — to identify malicious behavior and trace an adversary’s actions across multiple hosts.</p>
+
+        <p>This exercise helped sharpen my log analysis skills, especially in recognizing user impersonation, detecting
+        backdoor accounts, and using Splunk queries to pivot across correlated events. I also became more confident in
+        identifying key Windows Event IDs and using them to piece together an attack timeline.</p>
+
+        <p>From a SOC analyst perspective, this lab mirrored real-world detection and triage processes. It strengthened
+        my understanding of how SIEM tools support threat detection, incident response, and root cause analysis. These are skills
+        I aim to bring to an entry-level SOC role, where staying alert to anomalies and understanding attacker behavior is essential
+        to protecting enterprise systems.</p>
+
+        </section>
+        <section id="references1">
+            <h3>References</h3>
+            <ul>
+                <li><a href="https://www.iblue.team/incident-response-1/logging-powershell-activities">Logging PowerShell Activities</a></li>
+                <li><a href="https://learn.microsoft.com/en-us/sysinternals/downloads/sysmon">Sysmon</a></li>
+                <li><a href="https://docs.splunk.com/Documentation/Splunk/latest/SearchReference/rex">rex Splunk Documentation</a></li>
+            </ul>
+        </section>
+    </section>
+    <footer>
+        <p>&copy; 2024 Caleb Maldonado</p>
+    </footer>
+</body>
+</html>
